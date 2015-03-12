@@ -46,7 +46,19 @@ def request(method, path, body=None, headers=None):
     return urllib2.urlopen(request, timeout=30)
 
 
-def app_list(*args):
+def extract_filters(args):
+    filters = {}
+
+    for f in args:
+        key, value = f.split("=")
+        filters[key] = value
+
+    return filters
+
+
+def app_list(args):
+    filters = extract_filters(args)
+
     url = "/apps"
     headers = {"Content-Type": "application/json"}
     response = request("GET", url, "", headers)
@@ -54,6 +66,9 @@ def app_list(*args):
     apps = json.loads(data)
 
     for app in apps:
+        if "platform" in filters and app["platform"] != filters["platform"]:
+            continue
+
         sys.stdout.write("{} - {}\n".format(app["name"], app["ip"]))
 
 
