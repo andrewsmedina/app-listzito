@@ -24,14 +24,14 @@ class Request(urllib2.Request):
         return self._method
 
 
-def proxy_request(instance_name, method, path, body=None, headers=None):
+def request(method, path, body=None, headers=None):
     target = get_env("TSURU_TARGET").rstrip("/")
     token = get_env("TSURU_TOKEN")
 
     if not target.startswith("http://") and not target.startswith("https://"):
         target = "http://{}".format(target)
 
-    url = "{}{}".format(target, instance_name, path)
+    url = "{}{}".format(target, path)
 
     if body:
         body = json.dumps(body)
@@ -46,12 +46,15 @@ def proxy_request(instance_name, method, path, body=None, headers=None):
     return urllib2.urlopen(request, timeout=30)
 
 
-def app_list(name):
+def app_list(*args):
     url = "/apps"
     headers = {"Content-Type": "application/json"}
-    response = proxy_request(name, "GET", url, "", headers)
-    urls = response.read()
-    sys.stdout.write(urls + "\n")
+    response = request("GET", url, "", headers)
+    data = response.read()
+    apps = json.loads(data)
+
+    for app in apps:
+        sys.stdout.write("{} - {}\n".format(app["name"], app["ip"]))
 
 
 def main(*args):
