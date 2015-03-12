@@ -69,6 +69,9 @@ def app_list(args):
         if "platform" in filters and app["platform"] != filters["platform"]:
             continue
 
+        if "teamowner" in filters and app["teamowner"] != filters["teamowner"]:
+            continue
+
         sys.stdout.write("{} - {}\n".format(app["name"], app["ip"]))
 
 
