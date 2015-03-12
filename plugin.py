@@ -56,6 +56,13 @@ def extract_filters(args):
     return filters
 
 
+def match(app, filters):
+    for key, value in filters.items():
+        if app[key] == value:
+            return True
+    return False
+
+
 def app_list(args):
     filters = extract_filters(args)
 
@@ -66,10 +73,7 @@ def app_list(args):
     apps = json.loads(data)
 
     for app in apps:
-        if "platform" in filters and app["platform"] != filters["platform"]:
-            continue
-
-        if "teamowner" in filters and app["teamowner"] != filters["teamowner"]:
+        if not match(app, filters):
             continue
 
         sys.stdout.write("{} - {}\n".format(app["name"], app["ip"]))
