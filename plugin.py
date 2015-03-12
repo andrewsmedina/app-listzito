@@ -56,11 +56,13 @@ def extract_filters(args):
     return filters
 
 
-def match(app, filters):
+def match_all(app, filters):
+    matchers = len(filters)
+    ok = 0
     for key, value in filters.items():
         if app[key] == value:
-            return True
-    return False
+            ok += 1
+    return ok == matchers
 
 
 def app_list(args):
@@ -73,7 +75,7 @@ def app_list(args):
     apps = json.loads(data)
 
     for app in apps:
-        if not match(app, filters):
+        if not match_all(app, filters):
             continue
 
         sys.stdout.write("{} - {}\n".format(app["name"], app["ip"]))
